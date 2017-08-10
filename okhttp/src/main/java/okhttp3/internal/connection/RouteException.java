@@ -22,42 +22,47 @@ import java.lang.reflect.Method;
 /**
  * An exception thrown to indicate a problem connecting via a single Route. Multiple attempts may
  * have been made with alternative protocols, none of which were successful.
+ * <br> 以下内容不是翻译，来源于网络
+ * <p>
+ *     这个异常发生在 Request 请求还没有发出去前，就是打开 Socket 连接失败。
+ *     这个异常是 OkHttp 自定义的异常，是一个包裹类，包裹住了建联失败中发生的各种 Exception 主要发生 ConnectInterceptor 建立连接环节
+ *     比如连接超时抛出的 SocketTimeoutException，包裹在 RouteException 中
  */
 public final class RouteException extends RuntimeException {
-  private static final Method addSuppressedExceptionMethod;
+    private static final Method addSuppressedExceptionMethod;
 
-  static {
-    Method m;
-    try {
-      m = Throwable.class.getDeclaredMethod("addSuppressed", Throwable.class);
-    } catch (Exception e) {
-      m = null;
+    static {
+        Method m;
+        try {
+            m = Throwable.class.getDeclaredMethod("addSuppressed", Throwable.class);
+        } catch (Exception e) {
+            m = null;
+        }
+        addSuppressedExceptionMethod = m;
     }
-    addSuppressedExceptionMethod = m;
-  }
 
-  private IOException lastException;
+    private IOException lastException;
 
-  public RouteException(IOException cause) {
-    super(cause);
-    lastException = cause;
-  }
-
-  public IOException getLastConnectException() {
-    return lastException;
-  }
-
-  public void addConnectException(IOException e) {
-    addSuppressedIfPossible(e, lastException);
-    lastException = e;
-  }
-
-  private void addSuppressedIfPossible(IOException e, IOException suppressed) {
-    if (addSuppressedExceptionMethod != null) {
-      try {
-        addSuppressedExceptionMethod.invoke(e, suppressed);
-      } catch (InvocationTargetException | IllegalAccessException ignored) {
-      }
+    public RouteException(IOException cause) {
+        super(cause);
+        lastException = cause;
     }
-  }
+
+    public IOException getLastConnectException() {
+        return lastException;
+    }
+
+    public void addConnectException(IOException e) {
+        addSuppressedIfPossible(e, lastException);
+        lastException = e;
+    }
+
+    private void addSuppressedIfPossible(IOException e, IOException suppressed) {
+        if (addSuppressedExceptionMethod != null) {
+            try {
+                addSuppressedExceptionMethod.invoke(e, suppressed);
+            } catch (InvocationTargetException | IllegalAccessException ignored) {
+            }
+        }
+    }
 }

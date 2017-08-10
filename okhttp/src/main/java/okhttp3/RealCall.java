@@ -193,30 +193,38 @@ final class RealCall implements Call {
         return originalRequest.url().redact();
     }
 
+
     Response getResponseWithInterceptorChain() throws IOException {
+        // 这里采用了责任链模式，将一个流式工作分解为可配置的分段流程
+        // 流程图：https://app.yinxiang.com/shard/s22/nl/5111836/d733b170-92b9-4e3d-95ce-26c91947d5d6//res/4b7a220d-d81c-4694-b85f-08c441ef97a9/1240.png?resizeSmall&width=832
+
         // Build a full stack of interceptors.
-        // 创建连接器栈
+        // 创建拦截器栈
         List<Interceptor> interceptors = new ArrayList<>();
         // 添加自定义拦截器
         interceptors.addAll(client.interceptors());
-        // 重试拦截器
+        // 用来实现连接失败的重试和重定向，创建了 StreamAllocation
         interceptors.add(retryAndFollowUpInterceptor);
-        // 桥接拦截器，主要是重构请求头即header
+        // 桥接拦截器：修改 Request 请求头 header
         interceptors.add(new BridgeInterceptor(client.cookieJar()));
         // 缓存拦截器
         interceptors.add(new CacheInterceptor(client.internalCache()));
-        // 连接拦截器，连接服务器，https包装
+        // 连接拦截器：打开到服务端的连接（调用 StreamAllocation.newStream 方法）
+        // 建联的 TCP 握手，TLS 握手
         interceptors.add(new ConnectInterceptor(client));
 
-        if (!forWebSocket) { // OkHttpClient.newCall()
+        if (!forWebSocket) { // 如果调用 OkHttpClient.newCall() 会走这里
             interceptors.addAll(client.networkInterceptors());
         }
+        // 用来发起请求并且得到响应，把 Request 的请求信息传入流中，并且从流中读取数据封装成 Response 返回
         interceptors.add(new CallServerInterceptor(forWebSocket));
 
+        // RealInterceptorChain 是 Interceptor.Chain 的唯一的实现类，
+        // 所有 Interceptor 的 intercept 方法接收的都是 RealInterceptorChain 的实例
         Interceptor.Chain chain = new RealInterceptorChain(interceptors, null, null, null, 0,
                 originalRequest, this, eventListener, client.connectTimeoutMillis(),
                 client.readTimeoutMillis(), client.writeTimeoutMillis());
-
+        // 开始传递
         return chain.proceed(originalRequest);
     }
 }
