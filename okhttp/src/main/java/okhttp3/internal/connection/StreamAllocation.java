@@ -163,6 +163,7 @@ public final class StreamAllocation {
 
             // Do a (potentially slow) check to confirm that the pooled connection is still good. If it
             // isn't, take it out of the pool and start again.
+            // 检查连接池中的连接是否良好，如果不好，从池中取出，并重连
             if (!candidate.isHealthy(doExtensiveHealthChecks)) {
                 noNewStreams();
                 continue;

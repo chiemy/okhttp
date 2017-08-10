@@ -519,6 +519,7 @@ public final class RealConnection extends Http2Connection.Listener implements Co
         try {
           socket.setSoTimeout(1);
           if (source.exhausted()) {
+            // 流读取完了；socket 关闭了
             return false; // Stream is exhausted; socket is closed.
           }
           return true;
