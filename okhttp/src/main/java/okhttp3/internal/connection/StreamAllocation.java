@@ -155,6 +155,7 @@ public final class StreamAllocation {
                     connectionRetryEnabled);
 
             // If this is a brand new connection, we can skip the extensive health checks.
+            // 如果是个全新的连接，可以跳过进一步检查
             synchronized (connectionPool) {
                 if (candidate.successCount == 0) {
                     return candidate;
@@ -188,12 +189,15 @@ public final class StreamAllocation {
             if (canceled) throw new IOException("Canceled");
 
             // Attempt to use an already-allocated connection.
+            // 尝试使用已经分配的连接
             RealConnection allocatedConnection = this.connection;
             if (allocatedConnection != null && !allocatedConnection.noNewStreams) {
                 return allocatedConnection;
             }
 
             // Attempt to get a connection from the pool.
+            // 尝试从连接池中获取
+            // Internal.instance 在 OkHttpClient 中实例化的 --> ConnectionPool.get --> this.acquire
             Internal.instance.get(connectionPool, address, this, null);
             if (connection != null) {
                 foundPooledConnection = true;
@@ -329,6 +333,8 @@ public final class StreamAllocation {
 
     /**
      * Forbid new streams from being created on the connection that hosts this allocation.
+     * <br>
+     *     禁止 host 在此的连接创建新的 stream
      */
     public void noNewStreams() {
         Socket socket;
@@ -437,6 +443,8 @@ public final class StreamAllocation {
     /**
      * Use this allocation to hold {@code connection}. Each call to this must be paired with a call to
      * {@link #release} on the same connection.
+     * <br>
+     *     让此 allocation 持有连接。同一个连接，此方法的调用要和 release 方法成对出现。
      */
     public void acquire(RealConnection connection) {
         assert (Thread.holdsLock(connectionPool));

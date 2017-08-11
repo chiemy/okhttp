@@ -52,17 +52,26 @@ import okio.Source;
 /**
  * Caches HTTP and HTTPS responses to the filesystem so they may be reused, saving time and
  * bandwidth.
+ *<br>
+ *    将 HTTP 和 HTTPS 响应数据缓存到文件系统中，可以重用这些数据，以便节省时间和带宽
+ * <h3>Cache Optimization
+ * <br>缓存优化
+ * </h3>
  *
- * <h3>Cache Optimization</h3>
  *
  * <p>To measure cache effectiveness, this class tracks three statistics:
+ * <br>
+ *     此类通过三个指标评估缓存有效性：
  * <ul>
  *     <li><strong>{@linkplain #requestCount() Request Count:}</strong> the number of HTTP
  *         requests issued since this cache was created.
+ *         <br> 自缓存创建，HTTP 请求发送次数
  *     <li><strong>{@linkplain #networkCount() Network Count:}</strong> the number of those
  *         requests that required network use.
+ *         <br> 这些请求中使用网络的数量
  *     <li><strong>{@linkplain #hitCount() Hit Count:}</strong> the number of those requests
  *         whose responses were served by the cache.
+ *         <br> 这些请求中使用缓存的数量
  * </ul>
  *
  * Sometimes a request will result in a conditional cache hit. If the cache contains a stale copy of
@@ -70,16 +79,25 @@ import okio.Source;
  * the updated response if it has changed, or a short 'not modified' response if the client's copy
  * is still valid. Such responses increment both the network count and hit count.
  *
+ * <br> 有时请求会导致条件缓存命中。如果缓存包含旧的响应数据，客户端会发送一个条件的 GET 请求，如果内容有变化，
+ * 服务端会返回新的数据，如果客户端的缓存依然有效，则返回 ‘not modified’ 的响应，此时，网络请求数和缓存命中数都会增加。
+ *
  * <p>The best way to improve the cache hit rate is by configuring the web server to return
  * cacheable responses. Although this client honors all <a
  * href="http://tools.ietf.org/html/rfc7234">HTTP/1.1 (RFC 7234)</a> cache headers, it doesn't cache
  * partial responses.
+ * <br> 最好的提高缓存命中率的方法是，配置 web 服务返回可缓存的相应
+ * （翻译的有问题，不明白）尽管客户端遵从所有 HTTP/1.1 (RFC 7234) 缓存头，部分请求也不会缓存
  *
- * <h3>Force a Network Response</h3>
+ * <h3>Force a Network Response
+ * <br>强制网络请求
+ * </h3>
  *
  * <p>In some situations, such as after a user clicks a 'refresh' button, it may be necessary to
  * skip the cache, and fetch data directly from the server. To force a full refresh, add the {@code
- * no-cache} directive: <pre>   {@code
+ * no-cache} directive:
+ * <br> 在某些情况下，如用户点击刷新按钮后，有必要跳过缓存，直接从服务器获取数据。强制完全刷新，代码如下：
+ * <pre>   {@code
  *
  *   Request request = new Request.Builder()
  *       .cacheControl(new CacheControl.Builder().noCache().build())
@@ -88,7 +106,8 @@ import okio.Source;
  * }</pre>
  *
  * If it is only necessary to force a cached response to be validated by the server, use the more
- * efficient {@code max-age=0} directive instead: <pre>   {@code
+ * efficient {@code max-age=0} directive instead:
+ * <pre>   {@code
  *
  *   Request request = new Request.Builder()
  *       .cacheControl(new CacheControl.Builder()

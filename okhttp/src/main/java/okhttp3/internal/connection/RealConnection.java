@@ -96,7 +96,11 @@ public final class RealConnection extends Http2Connection.Listener implements Co
 
   // The fields below track connection state and are guarded by connectionPool.
 
-  /** If true, no new streams can be created on this connection. Once true this is always true. */
+  /**
+   * If true, no new streams can be created on this connection. Once true this is always true.
+   * <br>
+   *     如果为true，则不能在该连接上创建新的 stream，一旦为 true 则一直为 true
+   */
   public boolean noNewStreams;
 
   public int successCount;
@@ -413,6 +417,8 @@ public final class RealConnection extends Http2Connection.Listener implements Co
   /**
    * Returns true if this connection can carry a stream allocation to {@code address}. If non-null
    * {@code route} is the resolved route for a connection.
+   * <br>
+   *     如果此连接可以承接一个对此地址分配的 stream，则返回 true。如果路由非空，连接会使用此路由
    */
   public boolean isEligible(Address address, @Nullable Route route) {
     // If this connection is not accepting new streams, we're done.
