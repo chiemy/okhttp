@@ -104,7 +104,7 @@ public final class CacheInterceptor implements Interceptor {
 
         // If we have a cache response too, then we're doing a conditional get.
         if (cacheResponse != null) {
-            // 304 内容为变化
+            // 304 内容未变化
             if (networkResponse.code() == HTTP_NOT_MODIFIED) {
                 Response response = cacheResponse.newBuilder()
                         .headers(combine(cacheResponse.headers(), networkResponse.headers()))

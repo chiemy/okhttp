@@ -65,6 +65,8 @@ public final class HttpHeaders {
   /**
    * Returns true if none of the Vary headers have changed between {@code cachedRequest} and {@code
    * newRequest}.
+   * <br>
+   *     cachedRequest 和 newRequest 的 Vary 头是否一致
    */
   public static boolean varyMatches(
       Response cachedResponse, Headers cachedRequest, Request newRequest) {
@@ -76,6 +78,8 @@ public final class HttpHeaders {
 
   /**
    * Returns true if a Vary header contains an asterisk. Such responses cannot be cached.
+   * <br>
+   *     响应的 Vary 头中是否包含星号，如果包含则不缓存此响应。
    */
   public static boolean hasVaryAll(Response response) {
     return hasVaryAll(response.headers());
@@ -83,6 +87,8 @@ public final class HttpHeaders {
 
   /**
    * Returns true if a Vary header contains an asterisk. Such responses cannot be cached.
+   * <br>
+   *     响应的 Vary 头中是否包含星号，如果包含则不缓存此响应。
    */
   public static boolean hasVaryAll(Headers responseHeaders) {
     return varyFields(responseHeaders).contains("*");
